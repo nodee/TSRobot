@@ -1,6 +1,6 @@
 #include "robot.h"
 
-IRProx sensorMid(A1);
+IRProx oSensor(A0);
 
 const int Led_pin = 13;
 const int SensorEnable = 2;
@@ -13,12 +13,12 @@ void setup()
   pinMode(SensorEnable, OUTPUT);
   digitalWrite(SensorEnable, HIGH);
   Serial.begin(115200);
+  delay(1000);
 }
 
 void loop()
 {
-  sensorValue = sensorMid.getValue();
-  sensorMid.calibrate(sensorValue);
-  sensorMid.printValues();
-  delay(100);
+  oSensor.calibrate();
+  oSensor.printValues();
+  delay(500);
 }

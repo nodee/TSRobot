@@ -23,6 +23,9 @@ void IRProx::calibrate(uint16_t value)
 	}
 	return;
 }
+void IRProx::calibrate(void){
+  calibrate(getValue());
+}
 
 // gives the current analog reading as a % of the range
 uint8_t IRProx::update(void)
@@ -44,7 +47,10 @@ uint8_t IRProx::update(void)
 	value = value / (_maxValue - _minValue);
 	return (uint8_t)value;
 }
-
+void IRProx::reset(void){
+    _minValue = 1024;
+    _maxValue = 0;
+}
 // prints pin, min, max and current values of this sensor
 void IRProx::printValues(void){
   Serial.print(_analogPin);
