@@ -1,24 +1,32 @@
 #include "robot.h"
 
-IRProx oSensor(A0);
+// Analog sensors tested OK.
+// PWM tested OK.
+
 
 const int Led_pin = 13;
-const int SensorEnable = 2;
-
-int sensorValue = 0;
+int AIN1 = 5;
+int AIN2 = 6;
+int BIN1 = 11;
+int BIN2 = 3;
 
 void setup()
 {
   pinMode(Led_pin, OUTPUT);
-  pinMode(SensorEnable, OUTPUT);
-  digitalWrite(SensorEnable, HIGH);
-  Serial.begin(115200);
   delay(1000);
 }
-
 void loop()
 {
-  oSensor.calibrate();
-  oSensor.printValues();
-  delay(500);
+  analogWrite(AIN2, 0);
+  analogWrite(BIN2, 0);
+  analogWrite(AIN1, 250);
+  analogWrite(BIN1, 250);
+  digitalWrite(Led_pin, HIGH);
+  delay(2000);
+  analogWrite(AIN1, 0);
+  analogWrite(BIN1, 0);
+  analogWrite(AIN2, 250);
+  analogWrite(BIN2, 250);
+  digitalWrite(Led_pin, LOW);
+  delay(2000);
 }
