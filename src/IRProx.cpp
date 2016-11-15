@@ -1,15 +1,26 @@
 #include "IRProx.h"
 
-IRProx::IRProx(int analogPin){
+//
+IRProx::IRProx(void){
   _minValue = 1024;
   _maxValue = 0;
+}
+
+//
+void IRProx::setPin(int analogPin){
   _analogPin = analogPin;
 }
 
 // reads the analogPin associated with this proximity sensor
+uint16_t IRProx::readSensor()
+{
+  _currentValue =  analogRead(_analogPin);
+  return _currentValue;
+}
+
 uint16_t IRProx::getValue()
 {
-  return analogRead(_analogPin);
+  return _currentValue;
 }
 
 // updates the range if value lies outside current range
@@ -24,7 +35,7 @@ void IRProx::calibrate(uint16_t value)
 	return;
 }
 void IRProx::calibrate(void){
-  calibrate(getValue());
+  calibrate(readSensor());
 }
 
 // gives the current analog reading as a % of the range
@@ -32,7 +43,7 @@ uint8_t IRProx::update(void)
 {
 	uint16_t value = 0;
 
-	value = this->getValue();
+	value = this->readSensor();
 
 	if(value > _maxValue){
 		value = _maxValue;

@@ -2,7 +2,7 @@
 
 // Analog sensors tested OK.
 // PWM tested OK.
-
+LineDetector ld(A5, A2, A1, A0, A4, 2);
 
 const int Led_pin = 13;
 int AIN1 = 5;
@@ -13,20 +13,18 @@ int BIN2 = 3;
 void setup()
 {
   pinMode(Led_pin, OUTPUT);
+  Serial.begin(115200);
   delay(1000);
+  Serial.println("calibrating...");
+  for(int x = 0; x < 1000; x++){
+    ld.calibrateAll();
+  }
+  Serial.println("DONE.");
+  ld.printValues();
 }
+
 void loop()
 {
-  analogWrite(AIN2, 0);
-  analogWrite(BIN2, 0);
-  analogWrite(AIN1, 250);
-  analogWrite(BIN1, 250);
-  digitalWrite(Led_pin, HIGH);
-  delay(2000);
-  analogWrite(AIN1, 0);
-  analogWrite(BIN1, 0);
-  analogWrite(AIN2, 250);
-  analogWrite(BIN2, 250);
-  digitalWrite(Led_pin, LOW);
-  delay(2000);
+  delay(250);
+  Serial.println(ld.getError());
 }
