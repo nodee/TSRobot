@@ -1,10 +1,11 @@
 #include "pid.h"
 
-void pid::setTarget(int target){
-
-  _target = target;
-
-  return;
+pid::pid(int Kp, int Ki, int Kd){
+  _Kp = Kp;
+  _Ki = Ki;
+  _Kd = Kd;
+  _prev_error = 0;
+  _integral_sum = 0;
 }
 
 void pid::setGains(int Kp, int Ki, int Kd){
@@ -19,14 +20,14 @@ void pid::setGains(int Kp, int Ki, int Kd){
 int pid::calcResponse(int error, int dt)
 {
   int proportional;
-  int integral;
-  int derivative;
+  float integral = 0.0;
+  float derivative = 0.0;
 
-  proportional = _Kp * error;
-  integral = _Ki * (_integral_sum + (error * dt));
-  derivative = _Kd * ((error – _prev_error) / dt)
+  proportional = error;
+  integral = _integral_sum + (error * dt);
+  derivative = (error - _prev_error) / dt;
 
-  error = proportional + integral + derivative;
+  error = (_Kp * proportional) + (_Ki * integral) + (_Kd * derivative);
 
   //add some bounds checking and correction for turn value
 
