@@ -8,6 +8,7 @@ class IRProx{
     IRProx();
 		uint16_t readSensor(void);
 		uint16_t getValue(void);
+		uint16_t getPercentValue(void);
 		void calibrate(uint16_t value);
     void calibrate(void);
     uint8_t update(void);
@@ -20,6 +21,7 @@ class IRProx{
 		uint16_t _minValue;
     uint16_t _analogPin;
 		uint16_t _currentValue;
+		uint16_t _percentValue;
 };
 
 #endif

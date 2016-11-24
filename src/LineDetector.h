@@ -11,6 +11,7 @@ class LineDetector{
     int getError(void);
     void calibrateAll(void);
     void printValues(void);
+    int getBoolValues(void);
   protected:
   private:
     IRProx _LeftPin;

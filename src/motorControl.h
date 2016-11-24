@@ -12,7 +12,7 @@ public:
   void setMaxSpeed(int speed);
   void setMinSpeed(int speed);
   void updateMotors(int turn);
-  void rotate(int direction);
+  void rotate(int speed, int direction);
   void stop(void);
 private:
   int _direction;

@@ -1,6 +1,6 @@
 #include "pid.h"
 
-pid::pid(int Kp, int Ki, int Kd){
+pid::pid(float Kp, float Ki, float Kd){
   _Kp = Kp;
   _Ki = Ki;
   _Kd = Kd;
@@ -8,7 +8,7 @@ pid::pid(int Kp, int Ki, int Kd){
   _integral_sum = 0;
 }
 
-void pid::setGains(int Kp, int Ki, int Kd){
+void pid::setGains(float Kp, float Ki, float Kd){
 
   _Kp = Kp;
   _Ki = Ki;
@@ -19,19 +19,20 @@ void pid::setGains(int Kp, int Ki, int Kd){
 
 int pid::calcResponse(int error, int dt)
 {
-  int proportional;
+  float proportional;
   float integral = 0.0;
   float derivative = 0.0;
+  float thisError = (float)error;
 
-  proportional = error;
-  integral = _integral_sum + (error * dt);
-  derivative = (error - _prev_error) / dt;
+  proportional = thisError;
+  integral = _integral_sum + (thisError * dt);
+  derivative = (thisError - _prev_error) / dt;
 
-  error = (_Kp * proportional) + (_Ki * integral) + (_Kd * derivative);
+  thisError = (_Kp * proportional) + (_Ki * integral) + (_Kd * derivative);
 
   //add some bounds checking and correction for turn value
 
-  _prev_error = error;
+  _prev_error = thisError;
 
-  return error;
+  return (int)thisError;
 }

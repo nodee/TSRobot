@@ -27,19 +27,19 @@ void motorControl::setMaxSpeed(int speed){
   }
 }
 
-void motorControl::rotate(int direction){
+void motorControl::rotate(int speed, int direction){
 
   if(direction){
     analogWrite(_LeftBck, 0);
-    analogWrite(_LeftFwd, _maxSpeed);
+    analogWrite(_LeftFwd, speed);
     analogWrite(_RightFwd, 0);
-    analogWrite(_RightBck, _maxSpeed);
+    analogWrite(_RightBck, speed);
   }
   else{
     analogWrite(_LeftFwd, 0);
-    analogWrite(_LeftBck, _maxSpeed);
+    analogWrite(_LeftBck, speed);
     analogWrite(_RightBck, 0);
-    analogWrite(_RightFwd, _maxSpeed);
+    analogWrite(_RightFwd, speed);
   }
 }
 
@@ -59,7 +59,7 @@ int rightSpeed = 0;
   if(leftSpeed < 0){
     leftSpeed = 0;
   }
-  else if(rightSpeed > _maxSpeed){
+  else if(leftSpeed > _maxSpeed){
     leftSpeed = _maxSpeed;
   }
 
@@ -70,6 +70,11 @@ int rightSpeed = 0;
   else if(rightSpeed > _maxSpeed){
     rightSpeed = _maxSpeed;
   }
+
+  Serial.print(" Speed: ");
+  Serial.print(leftSpeed);
+  Serial.print(" - ");
+  Serial.print(rightSpeed);
 
   if(_direction){
     analogWrite(_LeftFwd, leftSpeed);

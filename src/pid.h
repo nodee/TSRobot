@@ -5,15 +5,15 @@
 
 class pid{
   public:
-    pid(int Kp, int Ki, int Kd);
+    pid(float Kp, float Ki, float Kd);
     int calcResponse(int error, int ms);
-    void setGains(int Kp, int Ki, int Kd);
+    void setGains(float Kp, float Ki, float Kd);
   private:
-    int _prev_error;
-    int _integral_sum;
-    int _Kp;
-    int _Ki;
-    int _Kd;
+    float _prev_error;
+    float _integral_sum;
+    float _Kp;
+    float _Ki;
+    float _Kd;
 };
 
 #endif

@@ -23,6 +23,10 @@ uint16_t IRProx::getValue()
   return _currentValue;
 }
 
+uint16_t IRProx::getPercentValue()
+{
+  return _percentValue;
+}
 // updates the range if value lies outside current range
 void IRProx::calibrate(uint16_t value)
 {
@@ -56,6 +60,7 @@ uint8_t IRProx::update(void)
 	}
 	value *= 100;
 	value = value / (_maxValue - _minValue);
+  _percentValue = value;
 	return (uint8_t)value;
 }
 void IRProx::reset(void){

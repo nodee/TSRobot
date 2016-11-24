@@ -49,19 +49,24 @@ int LineDetector::getError(void){
     _LeftPin.update();
     _RightPin.update();
     digitalWrite(_EnablePin, LOW);
-    result = (float)(_LeftPin.getValue() + (_MidLeftPin.getValue() * 2) + (_MidPin.getValue() * 3) + (_MidRightPin.getValue() * 4) + (_RightPin.getValue() * 5));
-    result = result / (float)(_LeftPin.getValue() + _MidLeftPin.getValue() + _MidPin.getValue() + _MidRightPin.getValue() + _RightPin.getValue());
+    result = (float)(_LeftPin.getPercentValue() + (_MidLeftPin.getPercentValue() * 2) + (_MidPin.getPercentValue() * 3) + (_MidRightPin.getPercentValue() * 4) + (_RightPin.getPercentValue() * 5));
+    result = result / (float)(_LeftPin.getPercentValue() + _MidLeftPin.getPercentValue() + _MidPin.getPercentValue() + _MidRightPin.getPercentValue() + _RightPin.getPercentValue());
     result *= 100;
-    result = 280-result;
+    result = 300-result;
   }
   else{
     digitalWrite(_EnablePin, LOW);
-    result = (float)(_MidLeftPin.getValue() + (_MidPin.getValue() * 2) + (_MidRightPin.getValue() * 3));
-    result = result / (float)(_MidLeftPin.getValue() + _MidPin.getValue() + _MidRightPin.getValue());
+    result = (float)(_MidLeftPin.getPercentValue() + (_MidPin.getPercentValue() * 2) + (_MidRightPin.getPercentValue() * 3));
+    result = result / (float)(_MidLeftPin.getPercentValue() + _MidPin.getPercentValue() + _MidRightPin.getPercentValue());
     result *= 100;
-    result = 280-result;
+    result = 300-result;
   }
-
+  if(result > 75){
+    result = 75;
+  }
+  if(result < -75){
+    result = -75;
+  }
   return (int)result;
 }
 
@@ -73,4 +78,29 @@ void LineDetector::printValues(void){
      _RightPin.printValues();
      _LeftPin.printValues();
    }
+}
+
+int LineDetector::getBoolValues(void){
+
+  int results = 0;
+
+  if(_MidLeftPin.update() > 50){
+    results &= (1<<3);
+  }
+  if(_MidPin.update() > 50){
+    results &= (1<<2);
+  }
+  if(_MidRightPin.update() > 50){
+    results &= (1<<1);
+  }
+
+  if(_allSensors){
+    if(_LeftPin.update() > 50){
+      results &= (1<<4);
+    }
+    if(_RightPin.update() > 50){
+      results &= 0x01;
+    }
+  }
+  return results;
 }
