@@ -2,22 +2,22 @@
 #include "TimerOne.h"
 
 //#define DEBUG
-
-// Analog sensors tested OK.
-// PWM tested OK.
 LineDetector ld(A5, A2, A1, A0, A4, 2);
-pid PID(2.5, 0, 0.5);
-// PID Trails:
-// 2.5,0,0.5 - gets round the first corner
+pid PID(2.5, 0, 0.5); // PID Trails - 2.5,0,0.5 - gets round the first corner
 motorControl mc(5,6,3,11);
 
-enum RobotStates{SETUP, CALI, NAVI, CHG_DIR};
-
 const int Led_pin = 13;
-int calcError = 0;
+
+enum RobotStates{OFF, BUTTON, INIT, CALI, FIND_LINE, RUN, BLOCKED, TURN_LEFT, TURN_RIGHT, TURN_AROUND};
+enum RobotStates state = OFF;
+enum ButtonStates{RELEASED, PRESSED};
+enum ButtonStates userButton = RELEASED;
+int error = 0;
 int response = 0;
-int state = SETUP;
-int initCounter = 0;
+int calibrateCounter = 0;
+bool PIDEnabled = 0;
+bool sensorsBinaryEnabled = 0;
+int sensorBinaryValue = 0;
 bool tick_20ms = 0;
 
 void tick(){
@@ -27,98 +27,87 @@ void tick(){
 void setup()
 {
   pinMode(Led_pin, OUTPUT);
-  //Serial.begin(115200);
   Timer1.initialize(20);
   Timer1.attachInterrupt(tick);
   mc.setMaxSpeed(255);
   mc.setMinSpeed(0);
   mc.setTarget(127);
   mc.setDirection(1);
+  delay(1000);
 }
 
 void loop()
 {
   if(tick_20ms){
     tick_20ms = 0;
+
+    if(PIDEnabled == 1){
+      error = ld.getError();
+      response = PID.calcResponse(error, 20);
+      mc.updateMotors(response);
+    }
+    if(sensorsBinaryEnabled == 1){
+      sensorBinaryValue = ld.getBoolValues();
+    }
     switch(state){
-      case SETUP:{
-        // Initiate PID, MC, IR, LD to start values, wait for input to start Calibration
-        mc.rotate(60, 1);
-        //Serial.println("CALI...");
+      case OFF:{
+        mc.stop();
+        break;
+      }
+      case BUTTON:{
+        if(digitalRead(userButton) == PRESSED){
+          state = INIT;
+        }
+        break;
+      }
+      case INIT:{
+        delay(1000);
         state = CALI;
+        mc.rotate(1, 150);
         break;
       }
       case CALI:{
-        if(initCounter < 600){
+        // rotate and spam calibrate sensors.
+        if(calibrateCounter < 2000){
           ld.calibrateAll();
-          initCounter++;
+          calibrateCounter++;
         }
         else{
-            //Serial.println("DONE.");
-            mc.stop();
-            state = NAVI;
-        }
-        break;
-      }
-      case NAVI:{
-        //long start = millis();
-        calcError = ld.getError();
-      //  Serial.print("Error: ");
-        //Serial.print(calcError);
-        response = PID.calcResponse(calcError, 20);
-        //Serial.print(" Response: ");
-        //Serial.print(response);
-        mc.updateMotors(response);
-        //Serial.print(" millis: ");
-        //Serial.println(millis() - start);
-         //Create a time base or pass the calculaton of ms since last PID calc
-         //PID Operational
-        break;
-      }
-      case CHG_DIR:{
-        // Pause PID and spin around or switch the direction. maybe with the
-        // sensors trailing the wheels the PID gains need adjusting.
-        break;
-      }
-    }
-  }
-  else{
-
-  }
-}
-
-void findTrack(){
-  int state = 0;
-  int found = 0;
-  int error = 0;
-
-  while(!found){
-    error = ld.getError();
-    switch(state){
-      case 0:{
-        mc.rotate(100, 1);
-        state = 1;
-        break;
-      }
-      case 1:{  // wait for higher than 40
-        if(error > 40){
-          state = 2;
-        }
-        break;
-      }
-      case 2:{  // keep going untill the error is on the way down
-        if((error < 40) && (error > 20)){
-          state = 3;
-        }
-        break;
-      }
-      case 3:{
-        if((error < 10) && (error > -10)){
           mc.stop();
-          found = 1;
+          state = FIND_LINE;
+          delay(500);
+        }
+
+        break;
+      }
+      case FIND_LINE:{
+        // rotate and use binary sensor readings to find the line.
+        break;
+      }
+      case RUN:{
+        PIDEnabled = 1;
+        if(prox.detect() == 1){
+          state = BLOCKED;
         }
         break;
       }
-    }
-  }
+      case BLOCKED:{
+        mc.stop();
+        // determine if need to turn left, right or around.
+        break;
+      }
+      case TURN_AROUND:{
+        // rotate 180 using the binary line detection
+        break;
+      }
+      case TURN_LEFT:{
+        // roatate 90 left using the binary line detection
+        break;
+      }
+      case TURN_RIGHT:{
+        // roatate 90 right using the binary line detection
+        break;
+      }
+    }// switch
+  }// if tick
 }
