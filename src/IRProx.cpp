@@ -1,17 +1,32 @@
 #include "IRProx.h"
 
-IRProx::IRProx(int analogPin){
+//
+IRProx::IRProx(void){
   _minValue = 1024;
   _maxValue = 0;
+}
+
+//
+void IRProx::setPin(int analogPin){
   _analogPin = analogPin;
 }
 
 // reads the analogPin associated with this proximity sensor
-uint16_t IRProx::getValue()
+uint16_t IRProx::readSensor()
 {
-  return analogRead(_analogPin);
+  _currentValue =  analogRead(_analogPin);
+  return _currentValue;
 }
 
+uint16_t IRProx::getValue()
+{
+  return _currentValue;
+}
+
+int IRProx::getPercentValue()
+{
+  return _percentValue;
+}
 // updates the range if value lies outside current range
 void IRProx::calibrate(uint16_t value)
 {
@@ -24,7 +39,7 @@ void IRProx::calibrate(uint16_t value)
 	return;
 }
 void IRProx::calibrate(void){
-  calibrate(getValue());
+  calibrate(readSensor());
 }
 
 // gives the current analog reading as a % of the range
@@ -32,7 +47,7 @@ uint8_t IRProx::update(void)
 {
 	uint16_t value = 0;
 
-	value = this->getValue();
+	value = this->readSensor();
 
 	if(value > _maxValue){
 		value = _maxValue;
@@ -45,8 +60,10 @@ uint8_t IRProx::update(void)
 	}
 	value *= 100;
 	value = value / (_maxValue - _minValue);
+  _percentValue = value;
 	return (uint8_t)value;
 }
+
 void IRProx::reset(void){
     _minValue = 1024;
     _maxValue = 0;
@@ -58,7 +75,7 @@ void IRProx::printValues(void){
   Serial.print("Min: ");
   Serial.print(_minValue);
   Serial.print(", Max: ");
-  Serial.print(_maxValue);
-  Serial.print(", Cur: ");
-  Serial.println(this->update());
+  Serial.println(_maxValue);
+  /*Serial.print(" Cur: ");
+  Serial.println(this->update());*/
 }
