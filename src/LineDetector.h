@@ -6,11 +6,11 @@
 
 class LineDetector{
   public:
-    LineDetector(int SensorMidLeft, int SensorMid, int SensorMidRight, int Enable);
     LineDetector(int SensorLeft, int SensorMidLeft, int SensorMid, int SensorMidRight, int SensorRight, int Enable);
     int getError(void);
     void calibrateAll(void);
     void printValues(void);
+    void setBoolThreshold(int threshold);
     int getBoolValues(void);
   protected:
   private:
@@ -20,7 +20,7 @@ class LineDetector{
     IRProx _MidRightPin;
     IRProx _RightPin;
     int _EnablePin;
-    boolean _allSensors;
+    int _BoolThreshold;
 };
 
 #endif

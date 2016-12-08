@@ -23,7 +23,7 @@ uint16_t IRProx::getValue()
   return _currentValue;
 }
 
-uint16_t IRProx::getPercentValue()
+int IRProx::getPercentValue()
 {
   return _percentValue;
 }
@@ -63,6 +63,7 @@ uint8_t IRProx::update(void)
   _percentValue = value;
 	return (uint8_t)value;
 }
+
 void IRProx::reset(void){
     _minValue = 1024;
     _maxValue = 0;
@@ -74,7 +75,7 @@ void IRProx::printValues(void){
   Serial.print("Min: ");
   Serial.print(_minValue);
   Serial.print(", Max: ");
-  Serial.print(_maxValue);
-  Serial.print(", Cur: ");
-  Serial.println(this->update());
+  Serial.println(_maxValue);
+  /*Serial.print(" Cur: ");
+  Serial.println(this->update());*/
 }

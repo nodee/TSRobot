@@ -9,22 +9,36 @@ motorControl::motorControl(int leftFwdPin, int leftBckPin, int rightFwdPin, int 
   _direction = 1;
   _maxSpeed = 255;
   _minSpeed = 0;
+  return;
 }
 
+void motorControl::setTarget(int target){
+  _target = target;
+  //Serial.print("_target: "); Serial.println(_target);
+  return;
+}
+void motorControl::setDirection(int direction){
+  _direction = direction;
+  //Serial.print("_direction: "); Serial.println(_direction);
+  return;
+}
 void motorControl::setMinSpeed(int speed){
   _minSpeed = speed;
 
   if(_minSpeed < 0){
     _minSpeed = 0;
   }
+  //Serial.print("_minSpeed: "); Serial.println(_minSpeed);
+  return;
 }
-
 void motorControl::setMaxSpeed(int speed){
   _maxSpeed = speed;
 
   if(_maxSpeed > 255){
     _maxSpeed = 255;
   }
+  //Serial.print("_maxSpeed: "); Serial.println(_maxSpeed);
+  return;
 }
 
 void motorControl::rotate(int speed, int direction){
@@ -41,6 +55,12 @@ void motorControl::rotate(int speed, int direction){
     analogWrite(_RightBck, 0);
     analogWrite(_RightFwd, speed);
   }
+  //Serial.print("Direction: "); Serial.print(direction);
+  //Serial.print(". Leftbck:"); Serial.print(_LeftBck);
+  //Serial.print(". Leftfwd:"); Serial.print(_LeftFwd);
+  //Serial.print(". Rightbck:"); Serial.print(_RightBck);
+  //Serial.print(". Rightfwd:"); Serial.println(_RightFwd);
+  return;
 }
 
 void motorControl::stop(void){
@@ -48,6 +68,7 @@ void motorControl::stop(void){
   analogWrite(_LeftBck, 0);
   analogWrite(_RightBck, 0);
   analogWrite(_RightFwd, 0);
+  return;
 }
 
 void motorControl::updateMotors(int turn){
@@ -71,11 +92,6 @@ int rightSpeed = 0;
     rightSpeed = _maxSpeed;
   }
 
-  Serial.print(" Speed: ");
-  Serial.print(leftSpeed);
-  Serial.print(" - ");
-  Serial.print(rightSpeed);
-
   if(_direction){
     analogWrite(_LeftFwd, leftSpeed);
     analogWrite(_RightFwd, rightSpeed);
@@ -84,19 +100,5 @@ int rightSpeed = 0;
     analogWrite(_LeftBck, leftSpeed);
     analogWrite(_RightBck, rightSpeed);
   }
-
-}
-
-void motorControl::setTarget(int target){
-
-  _target = target;
-
-  return;
-}
-
-void motorControl::setDirection(int direction){
-
-  _direction = direction;
-
   return;
 }
