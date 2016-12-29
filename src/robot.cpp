@@ -43,7 +43,7 @@ void setup()
   mc.setMinSpeed(0);
   mc.setTarget(150);
   mc.setDirection(1);
-  ld.setBoolThreshold(25);
+  ld.setThreshold(25);
   delay(1000);
   hwCounter_A = 50;
   //Serial.println("CALI START");
@@ -84,7 +84,7 @@ void loop()
       case CALI:{                   // Rotate and calibrate sensors.
         if(!CalibrationComplete){
           if(calibrateCounter < 650){
-            ld.calibrateAll();
+            ld.calibrate();
             calibrateCounter++;
           }
           else{

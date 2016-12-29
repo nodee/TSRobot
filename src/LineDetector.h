@@ -2,24 +2,23 @@
 #define LINE_DETECTOR_H
 
 #include <Arduino.h>
-#include "IRProx.h"
+#include "IRSensor.h"
 
 class LineDetector{
   public:
-    LineDetector(int SensorLeft, int SensorMidLeft, int SensorMid, int SensorMidRight, int SensorRight, int Enable);
+    LineDetector(int sLeft, int sMidLeft, int sMid, int sMidRight, int sRight, int sEnable);
     int getError(void);
-    void calibrateAll(void);
-    void printValues(void);
-    void setBoolThreshold(int threshold);
+    void calibrate(void);
+    void setThreshold(int threshold);
     int getBoolValues(void);
   protected:
   private:
-    IRProx _LeftPin;
-    IRProx _MidLeftPin;
-    IRProx _MidPin;
-    IRProx _MidRightPin;
-    IRProx _RightPin;
-    int _EnablePin;
+    IRSensor _lLeft;
+		IRSensor _lMidLeft;
+		IRSensor _lMid;
+		IRSensor _lMidRight;
+		IRSensor _lRight;
+    int _enablePin;
     int _BoolThreshold;
 };
 
