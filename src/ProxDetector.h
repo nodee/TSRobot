@@ -13,6 +13,6 @@ class ProxDetector{
     int _frontSensorPin;
     int _rightSensorPin;
     int _enablePin;
-  }
+  };
 
   #endif

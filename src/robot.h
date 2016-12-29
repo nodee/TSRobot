@@ -1,5 +1,5 @@
 #include <arduino.h>
-#include "IRProx.h"
+#include "IRSensor.h"
 #include "LineDetector.h"
 #include "pid.h"
 #include "motorControl.h"
