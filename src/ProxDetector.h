@@ -2,16 +2,17 @@
 #define PROXDETECTOR_H
 
 #include <Arduino.h>
+#include "IRSensor.h"
 
 class ProxDetector{
 	public:
-    ProxDetector(int leftSensorPin, int frontSensorPin, int rightSensorPin, int enablePin);
-    void printValues(void);
+    ProxDetector(int sLeft, int sFront, int sRight, int sEnable);
+		void setThreshold(int threshold);
+    int getBoolValues(void);
   private:
-    int readSensor(int sensor);
-    int _leftSensorPin;
-    int _frontSensorPin;
-    int _rightSensorPin;
+    IRSensor _pLeft;
+    IRSensor _pFront;
+    IRSensor _pRight;
     int _enablePin;
   };
 

@@ -13,11 +13,11 @@ class LineDetector{
     int getBoolValues(void);
   protected:
   private:
-    IRSensor _left;
-		IRSensor _midLeft;
-		IRSensor _mid;
-		IRSensor _midRight;
-		IRSensor _right;
+    IRSensor _lLeft;
+		IRSensor _lMidLeft;
+		IRSensor _lMid;
+		IRSensor _lMidRight;
+		IRSensor _lRight;
     int _enablePin;
     int _BoolThreshold;
 };

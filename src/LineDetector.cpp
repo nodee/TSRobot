@@ -1,7 +1,7 @@
 #include "LineDetector.h"
 
 LineDetector::LineDetector(int sLeft, int sMidLeft, int sMid, int sMidRight, int sRight, int sEnable)
-:_left(sLeft), _midLeft(sMidLeft), _mid(sMid), _midRight(sMidRight), _right(sRight)
+:_lLeft(sLeft), _lMidLeft(sMidLeft), _lMid(sMid), _lMidRight(sMidRight), _lRight(sRight)
 {
 	_enablePin = sEnable;
 	pinMode(_enablePin, OUTPUT);
@@ -10,20 +10,20 @@ LineDetector::LineDetector(int sLeft, int sMidLeft, int sMid, int sMidRight, int
 void LineDetector::calibrate(void){
     digitalWrite(_enablePin, HIGH);
     delay(5);
-    _midLeft.findRange();
-    _mid.findRange();
-    _midRight.findRange();
-    _left.findRange();
-    _right.findRange();
+    _lMidLeft.findRange();
+    _lMid.findRange();
+    _lMidRight.findRange();
+    _lLeft.findRange();
+    _lRight.findRange();
     digitalWrite(_enablePin, LOW);
 }
 
 void LineDetector::setThreshold(int threshold){
-  _left.setThreshold(threshold);
-  _midLeft.setThreshold(threshold);
-  _mid.setThreshold(threshold);
-  _midRight.setThreshold(threshold);
-  _right.setThreshold(threshold);
+  _lLeft.setThreshold(threshold);
+  _lMidLeft.setThreshold(threshold);
+  _lMid.setThreshold(threshold);
+  _lMidRight.setThreshold(threshold);
+  _lRight.setThreshold(threshold);
   return;
 }
 
@@ -34,19 +34,19 @@ int LineDetector::getBoolValues(void){
   digitalWrite(_enablePin, HIGH);
   delay(5);
 
-	if(_left.getBoolValue()){
+	if(_lLeft.getBoolValue()){
 		result |= (1<<4);
 	}
-	if(_midLeft.getBoolValue()){
+	if(_lMidLeft.getBoolValue()){
 		result |= (1<<3);
 	}
-	if(_mid.getBoolValue()){
+	if(_lMid.getBoolValue()){
 		result |= (1<<2);
 	}
-	if(_midRight.getBoolValue()){
+	if(_lMidRight.getBoolValue()){
 		result |= (1<<1);
 	}
-	if(_right.getBoolValue()){
+	if(_lRight.getBoolValue()){
 		result |= 1;
 	}
 
@@ -65,11 +65,11 @@ int LineDetector::getError(){
 	digitalWrite(_enablePin, HIGH);
 	delay(2);
 
-	sensorValues[SL] = _left.getPercentValue();
-	sensorValues[SML] = _midLeft.getPercentValue();
-	sensorValues[SM] = _mid.getPercentValue();
-	sensorValues[SMR] = _midRight.getPercentValue();
-	sensorValues[SR] = _right.getPercentValue();
+	sensorValues[SL] = _lLeft.getPercentValue();
+	sensorValues[SML] = _lMidLeft.getPercentValue();
+	sensorValues[SM] = _lMid.getPercentValue();
+	sensorValues[SMR] = _lMidRight.getPercentValue();
+	sensorValues[SR] = _lRight.getPercentValue();
 
 	digitalWrite(_enablePin, LOW);
 
