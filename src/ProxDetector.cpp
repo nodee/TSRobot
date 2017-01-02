@@ -15,6 +15,31 @@ void ProxDetector::setThreshold(int threshold)
   return;
 }
 
+void ProxDetector::caliThreshold(){
+
+  float result = 0.0;
+
+  digitalWrite(_enablePin, HIGH);
+  delay(5);
+
+  result = (float)_pLeft.readSensor();
+  result = result * THRESHOLD_MULTIPLIER;
+  _pLeft.setThreshold((int)result);
+
+  result = (float)_pFront.readSensor();
+  result = result * THRESHOLD_MULTIPLIER;
+  _pFront.setThreshold((int)result);
+
+  result = (float)_pRight.readSensor();
+  result = result * THRESHOLD_MULTIPLIER;
+  _pRight.setThreshold((int)result);
+
+  digitalWrite(_enablePin, LOW);
+
+  return;
+
+}
+
 int ProxDetector::getBoolValues()
 {
   int result = 0;
