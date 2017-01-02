@@ -1,11 +1,11 @@
-#ifndef PID_H
-#define PID_H
+#ifndef PID_CONTROLLLER_H
+#define PID_CONTROLLLER_H
 
 #include <Arduino.h>
 
-class pid{
+class PIDController{
   public:
-    pid(float Kp, float Ki, float Kd);
+    PIDController(void);
     int calcResponse(int error, int ms);
     void setGains(float Kp, float Ki, float Kd);
   private:

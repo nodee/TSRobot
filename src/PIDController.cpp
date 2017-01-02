@@ -1,14 +1,14 @@
-#include "pid.h"
+#include "PIDController.h"
 
-pid::pid(float Kp, float Ki, float Kd){
-  _Kp = Kp;
-  _Ki = Ki;
-  _Kd = Kd;
+PIDController::PIDController(void){
+  _Kp = 1;
+  _Ki = 1;
+  _Kd = 1;
   _prev_error = 0;
   _integral_sum = 0;
 }
 
-void pid::setGains(float Kp, float Ki, float Kd){
+void PIDController::setGains(float Kp, float Ki, float Kd){
 
   _Kp = Kp;
   _Ki = Ki;
@@ -17,7 +17,7 @@ void pid::setGains(float Kp, float Ki, float Kd){
   return;
 }
 
-int pid::calcResponse(int error, int dt)
+int PIDController::calcResponse(int error, int dt)
 {
   float proportional;
   float integral = 0.0;
