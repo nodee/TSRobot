@@ -1,7 +1,7 @@
 #include "robot.h"
 #include "TimerOne.h"
 
-//#define DEBUG
+#define DEBUG 1
 LineDetector ld(A5, A2, A1, A0, A4, 2);
 ProxDetector pd(A7, A6, A3, 2);
 PIDController pid;
@@ -9,19 +9,27 @@ MotorController mc(5,6,3,11);
 
 const int Led_pin = 13;
 const int userButton_pin = 12;
-const int tick_time = 20;
 
-enum RobotStates{OFF, BUTTON, INIT, CALI, FIND_LINE, RUN, BLOCKED, TURN_LEFT, TURN_RIGHT, TURN_AROUND};
+const int tick_time_us = 10000;
+const int tick_time_ms = 10;
+bool tick_flag = 0;
+
+enum RobotStates{OFF, BUTTON, INIT, CALI, RUN, LINE, PROX};
 enum RobotStates state = INIT;
-enum RobotStates prevState = OFF;
+
 enum ButtonStates{RELEASED = 0, PRESSED = 1};
+
 int error = 0;
 int response = 0;
-int sensorBinaryValue = 0;
-bool tick_flag = 0;
+long lastMillis = 0;
+long thisMillis = 0;
+
+int ldBoolValues = 0;
+
+int pdBoolValues = 0;
+
 int hwCounter_A = 0;
-int findingLineState = 0;
-int CalibrationComplete = 0;
+
 
 void tick(){
   tick_flag = 1;
@@ -32,31 +40,50 @@ void tick(){
 
 void setup()
 {
-  //Serial.begin(115200);
+  #if DEBUG
+  Serial.begin(115200);
+  #endif
   pinMode(Led_pin, OUTPUT);
   pinMode(userButton_pin, INPUT);
-  Timer1.initialize(tick_time);
+  Timer1.initialize(tick_time_us);
   Timer1.attachInterrupt(tick);
 
   pid.setGains(2.5, 0, 0.5);   // PID Trails - 2.5,0,0.5 - gets round the first corner
-
-  ld.setThreshold(25);          // Line detector threshold values
-
-  pd.setThreshold(300);         // Proximity detector threshold values
-
+  ld.setThreshold(25);         // Line detector threshold values
+  pd.setThreshold(300);        // Proximity detector threshold values
   mc.setMotors(0, STOP);
   mc.setTarget(150);
-
   delay(1000);
-
-  hwCounter_A = 50;
 }
 
 void loop()
 {
-  if(tick_flag){
-    tick_flag = 0;
+#if DEBUG
 
+    if(digitalRead(userButton_pin) == PRESSED){
+      Serial.println("Button Pressed");
+    }
+
+    digitalWrite(2, HIGH);
+    delay(10);
+
+    Serial.println("Line Sensors.");
+    Serial.print("Left : "); Serial.println(analogRead(A5));
+    Serial.print("Mid L: "); Serial.println(analogRead(A6));
+    Serial.print("Mid  : "); Serial.println(analogRead(A1));
+    Serial.print("Mid R: "); Serial.println(analogRead(A0));
+    Serial.print("Right: "); Serial.println(analogRead(A4));
+
+    Serial.println("Proximity Sensors.");
+    Serial.print("Left : "); Serial.println(analogRead(A7));
+    Serial.print("Front: "); Serial.println(analogRead(A6));
+    Serial.print("Right: "); Serial.println(analogRead(A3));
+
+    digitalWrite(2, LOW);
+
+    delay(333);
+
+#else
     switch(state){                  // Robot State
       case OFF:{                    // OFF
         mc.setMotors(0, STOP);
@@ -65,7 +92,7 @@ void loop()
       }
       case BUTTON:{                 // Wait for button press to start
         if(digitalRead(userButton_pin) == PRESSED){
-          hwCounter_A = 50;
+          hwCounter_A = 25;
           state = INIT;
         }
         break;
@@ -74,105 +101,75 @@ void loop()
         if(!hwCounter_A){
           pd.caliThreshold();       // Calibrate proximity sensors
           mc.setMotors(150, LEFT);  // rotate left
-          hwCounter_A = 650;
+          hwCounter_A = 500;
           state = CALI;
         }
         break;
       }
       case CALI:{                   // Rotate and calibrate sensors.
         if(hwCounter_A){
-          ld.calibrate();         // calibrate line sensors
+          ld.calibrate();           // calibrate line sensors
         }
         else{
-          mc.setMotors(0, STOP);  // Calibration Complete.
-          findingLineState = 0;
-          hwCounter_A = 25;
+          mc.setMotors(0, STOP);    // Calibration Complete.
+          hwCounter_A = 500;
           state = RUN;
         }
         break;
       }
       case RUN:{                    // Normal Running Mode
+        thisMillis = millis();
         error = ld.getError();
-        response = pid.calcResponse(error, tick_time);
+        response = pid.calcResponse(error, (thisMillis - lastMillis));
         mc.updateMotors(response);
-
-        //check bool line values
-        //check bool prox values
-        //PID
+        lastMillis = thisMillis;
+        state = LINE;
         break;
       }
+      case LINE:{
+        ldBoolValues = ld.getBoolValues();
+        switch (ldBoolValues) {
+          case 0b00000000:{
+            mc.setMotors(150, LEFT);
+            break;
+          }
+          case 0b00011000:{
+            mc.setMotors(150, LEFT);
+            break;
+          }
+          case 0b00010000:{
+            mc.setMotors(220, LEFT);
+            break;
+          }
+          case 0b00000011:{
+            mc.setMotors(150, RIGHT);
+            break;
+          }
+          case 0b00000001:{
+            mc.setMotors(220, RIGHT);
+            break;
+          }
+          default:{
+            state = RUN;
+          }
+        }
+        break;
+      }
+      /*case PROX:{
+        pdBoolValues = pd.getBoolValues();
+        if(pdBoolValues){
+          mc.setMotors(0, STOP);
+          switch(pdBoolValue)
+        }
+        else{
+          state = RUN;
+        }
+        break;
+      }*/
       default:{
         state = OFF;
         break;
       }
     }// switch
-  }// if tick
+#endif
 }
-
-
-/*
-case FIND_LINE:{              // Use binary sensor readings to find line.
-  if(!hwCounter_A){
-    sensorBinaryValue = ld.getBoolValues();
-    switch(findingLineState){
-      case 0:{
-        mc.setMotors(45, RIGHT);    // start rotating
-        findingLineState++;
-        break;
-      }
-      case 1:{                // find free space as a starting point.
-        if(!sensorBinaryValue){
-          findingLineState++;
-        }
-        break;
-      }
-      case 2:{          // wait for the furest left or right sensor to trigger
-        sensorBinaryValue &= 0x00010001;  // mask off the other sensors ****might not need****
-        if((sensorBinaryValue == 0b00010000) || (sensorBinaryValue == 0b00000001)){
-          findingLineState++;
-        }
-        break;
-      }
-      case 3:{         // still rotating wait for the middle sensor to hit
-        if(sensorBinaryValue & 0b00000100){
-          findingLineState++;
-        }
-        break;
-      }
-      case 4:{        // slow the rotation and find spot between error = 5 / -5
-        error = ld.getError();
-        if(error < -5){
-          mc.setMotors(20, LEFT);
-        }
-        else if(error > 5){
-          mc.setMotors(20, RIGHT);
-        }
-        else{       // line found, stop, go to prev state.
-          mc.setMotors(0, STOP);
-          findingLineState = 0;
-          state = prevState;
-        }
-        break;
-      }
-    }
-  }
-  break;
-}
-case BLOCKED:{                // Proximit sensor tripped.
-  mc.stop();
-  // determine if need to turn left, right or around.
-  break;
-}
-case TURN_AROUND:{            // Evasive Actions.
-  // rotate 180 using the binary line detection
-  break;
-}
-case TURN_LEFT:{
-  // roatate 90 left using the binary line detection
-  break;
-}
-case TURN_RIGHT:{
-  // roatate 90 right using the binary line detection
-  break;
-}
-*/
