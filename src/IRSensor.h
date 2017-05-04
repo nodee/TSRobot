@@ -12,6 +12,7 @@ class IRSensor{
 		bool getBoolValue(void);
 		void findRange(void);
 		int getPercentValue(void);
+		void printInfo(void);
 	private:
 		int _inputPin;
 		int _minValue;

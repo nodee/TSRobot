@@ -26,7 +26,7 @@ bool IRSensor::getBoolValue(void){
 	int sensorValue;
 	bool boolValue;
 
-	sensorValue = readSensor();
+	sensorValue = getPercentValue();
 
 	if(sensorValue > _threshold){
 		boolValue = 1;
@@ -76,4 +76,9 @@ int IRSensor::getPercentValue(void){
 	sensorValue /= _sensorRange;
 
 	return sensorValue;
+}
+
+void IRSensor::printInfo(){
+	Serial.print(_inputPin);Serial.print(": ");
+	Serial.print(" per: ");Serial.println(this->getPercentValue());
 }
